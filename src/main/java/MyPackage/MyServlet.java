@@ -7,8 +7,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
+import java.util.TimeZone;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -68,10 +71,9 @@ public class MyServlet extends HttpServlet {
 		
 		Gson gson = new Gson();
 		JsonObject jsonObject = gson.fromJson(responseContent.toString(), JsonObject.class);
-		
-		//date and time
-		long dateTimeStump = jsonObject.get("dt").getAsLong() * 1000;
-		String date = new Date(dateTimeStump).toString();
+				
+		//place
+		String place = jsonObject.get("name").toString();
 		
 		//temp
 		double temp = (int) ((jsonObject.getAsJsonObject("main").get("temp").getAsDouble()) - 273);
@@ -80,25 +82,18 @@ public class MyServlet extends HttpServlet {
 		//wind speed
 		double windSpeed = jsonObject.getAsJsonObject("wind").get("speed").getAsDouble();
 		//weather condition
-		String weatherCondition = jsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("main").toString();
+		String weatherCondition = jsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("main").getAsString();
 		
-		request.setAttribute("date", date);
+		request.setAttribute("place", place);
 		request.setAttribute("temp", temp);
 		request.setAttribute("humidity", humidity);
 		request.setAttribute("windSpeed", windSpeed);
 		request.setAttribute("weatherCondition", weatherCondition);
 		connection.disconnect();
 		
-		//forword
+		//Forward
 		request.getRequestDispatcher("index.jsp").forward(request, response);
-		System.out.println(humidity);
-		System.out.println(date);
-		System.out.println(windSpeed);
-		System.out.println(responseContent);
-		System.out.println(weatherCondition);
 		
-		System.out.println(jsonObject + "json data");
-
 		doGet(request, response);
 	}
 
